@@ -8,33 +8,6 @@ export default component$(() => {
   const email = useSignal("");
   const submitted = useSignal(false);
 
-  const handleSubmit = $((e: Event) => {
-    e.preventDefault();
-
-    // ============================================
-    // TODO: BACKEND INTEGRATION REQUIRED
-    // ============================================
-    // Integrate with your backend API to send password reset email
-    //
-    // const response = await fetch('/api/auth/forgot-password', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     email: email.value
-    //   })
-    // });
-    //
-    // if (response.ok) {
-    //   submitted.value = true;
-    // } else {
-    //   // Display error message to user
-    // }
-    // ============================================
-
-    // Temporary: Show success UI (replace with actual API integration)
-    submitted.value = true;
-  });
-
   const handleNavigate = $((path: string) => {
     nav(path);
   });
@@ -83,7 +56,7 @@ export default component$(() => {
               Enter your email and we'll send you a reset link
             </p>
 
-            <form onSubmit$={handleSubmit}>
+            <div>
               <div
                 class={css({
                   mb: "1.5rem",
@@ -160,7 +133,7 @@ export default component$(() => {
                   Sign in
                 </button>
               </p>
-            </form>
+            </div>
           </>
         ) : (
           <div
@@ -193,7 +166,7 @@ export default component$(() => {
             >
               We've sent a password reset link to <strong>{email.value}</strong>
             </p>
-            <button
+            <div
               onClick$={() => handleNavigate("/sign-in")}
               class={css({
                 bg: "gray.800",
@@ -209,7 +182,7 @@ export default component$(() => {
               })}
             >
               Back to Sign In
-            </button>
+            </div>
           </div>
         )}
       </div>

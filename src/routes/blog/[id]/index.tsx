@@ -1,7 +1,6 @@
 import {
   component$,
   useSignal,
-  $,
   useContext,
   useResource$,
   Resource,
