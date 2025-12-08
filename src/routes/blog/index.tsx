@@ -5,7 +5,7 @@ import { css } from "~/styled-system/css";
 import { flex, grid } from "~/styled-system/patterns";
 import { roleContext } from "../layout";
 
-const usePost = routeLoader$(async () => {
+export const usePost = routeLoader$(async () => {
   const response = await fetch("http://localhost:4000/post/get", {
     method: "GET",
   });

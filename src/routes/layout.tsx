@@ -29,7 +29,7 @@ export default component$(() => {
   const postCount = useSignal<number>(1);
   useContextProvider(postCountContext, postCount);
 
-  useVisibleTask$(async ({ track, cleanup }) => {
+  useVisibleTask$(async () => {
     const response = await fetch("http://localhost:4000/auth-status", {
       method: "GET",
       credentials: "include",
