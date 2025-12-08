@@ -5,11 +5,11 @@ export default component$(() => {
   return (
     <div
       class={css({
-        padding: 10,
+        padding: "10",
         bg: "red.400",
         height: "dvh",
-        margin: 100,
-        fontSize: 30,
+        margin: "[100]",
+        fontSize: "[30]",
       })}
     >
       This box is styled with PandaCSS.
