@@ -64,7 +64,7 @@ export default defineConfig(({ command, mode }): UserConfig => {
     },
     resolve: {
       alias: {
-        '~': path.resolve(__dirname, 'src')
+        'src': path.resolve(__dirname, 'src')
       }
     }
   };
