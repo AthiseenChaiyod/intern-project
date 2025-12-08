@@ -449,7 +449,7 @@ export default component$(() => {
   );
 });
 
-export const head: DocumentHead = ({ params }) => {
+export const head: DocumentHead = () => {
   return {
     title: "Blog Post - PTI",
     meta: [
