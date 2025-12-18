@@ -201,7 +201,7 @@ export default component$(() => {
                         }
 
                         step.value = 2;
-                      } catch (err: any) {
+                      } catch {
                         errorMessage.value =
                           "Username not found. Please try again.";
                       } finally {
@@ -288,9 +288,8 @@ export default component$(() => {
                         }
 
                         step.value = 3;
-                      } catch (err: any) {
+                      } catch {
                         errorMessage.value =
-                          err.message ||
                           "Email does not match. Please try again.";
                       } finally {
                         isLoading.value = false;
@@ -459,7 +458,7 @@ export default component$(() => {
                         }
 
                         step.value = 4;
-                      } catch (err: any) {
+                      } catch {
                         errorMessage.value =
                           "Failed to change password. Please try again.";
                       } finally {

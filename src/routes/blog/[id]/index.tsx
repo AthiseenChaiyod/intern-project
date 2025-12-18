@@ -474,7 +474,7 @@ export default component$(() => {
 
                       commentContent.value = "";
                       commentTrigger.value++;
-                    } catch (err) {
+                    } catch {
                       alert("Failed to post comment. Please try again.");
                     } finally {
                       isCommentLoading.value = false;
