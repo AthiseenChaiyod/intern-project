@@ -4,10 +4,8 @@ import { css } from "~/styled-system/css";
 import { flex, grid } from "~/styled-system/patterns";
 
 export default component$(() => {
-  //* VARIABLE DECLARATION
   const nav = useNavigate();
 
-  //* REUSABLE LOGIC
   const handleNavigate = $((path: string) => {
     nav(path);
   });
@@ -72,22 +70,24 @@ export default component$(() => {
                   color: "gray.400",
                   textAlign: "left",
                   cursor: "pointer",
-                  _hover: { color: "amber.300" },
                   transition: "color 0.2s",
+
+                  _hover: { color: "amber.300" },
                 })}
               >
                 Home
               </button>
               <button
-                onClick$={() => handleNavigate("/product")}
+                onClick$={() => handleNavigate("/products")}
                 class={css({
                   bg: "transparent",
                   border: "none",
                   color: "gray.400",
                   textAlign: "left",
                   cursor: "pointer",
-                  _hover: { color: "amber.300" },
                   transition: "color 0.2s",
+
+                  _hover: { color: "amber.300" },
                 })}
               >
                 Products
@@ -100,8 +100,9 @@ export default component$(() => {
                   color: "gray.400",
                   textAlign: "left",
                   cursor: "pointer",
-                  _hover: { color: "amber.300" },
                   transition: "color 0.2s",
+
+                  _hover: { color: "amber.300" },
                 })}
               >
                 Blog
@@ -114,8 +115,9 @@ export default component$(() => {
                   color: "gray.400",
                   textAlign: "left",
                   cursor: "pointer",
-                  _hover: { color: "amber.300" },
                   transition: "color 0.2s",
+
+                  _hover: { color: "amber.300" },
                 })}
               >
                 Contact
@@ -139,9 +141,10 @@ export default component$(() => {
                 class={css({
                   color: "gray.400",
                   fontSize: "0.9rem",
+
                   _hover: { cursor: "pointer", color: "amber.300" },
                 })}
-                onClick$={() => nav("/products/1")}
+                onClick$={() => nav("/products/car-parking-system")}
               >
                 Car Parking System
               </p>
@@ -149,8 +152,10 @@ export default component$(() => {
                 class={css({
                   color: "gray.400",
                   fontSize: "0.9rem",
+
                   _hover: { cursor: "pointer", color: "amber.300" },
                 })}
+                onClick$={() => nav("/products/turnstiles-gate")}
               >
                 Turnstiles Gate
               </p>
@@ -158,8 +163,10 @@ export default component$(() => {
                 class={css({
                   color: "gray.400",
                   fontSize: "0.9rem",
+
                   _hover: { cursor: "pointer", color: "amber.300" },
                 })}
+                onClick$={() => nav("/products/software-and-application")}
               >
                 Software & Application
               </p>
@@ -167,8 +174,10 @@ export default component$(() => {
                 class={css({
                   color: "gray.400",
                   fontSize: "0.9rem",
+
                   _hover: { cursor: "pointer", color: "amber.300" },
                 })}
+                onClick$={() => nav("/products/visitor-management-system")}
               >
                 Visitor Management
               </p>
@@ -176,8 +185,10 @@ export default component$(() => {
                 class={css({
                   color: "gray.400",
                   fontSize: "0.9rem",
+
                   _hover: { cursor: "pointer", color: "amber.300" },
                 })}
+                onClick$={() => nav("/products/parking-guidance")}
               >
                 Parking Guidance
               </p>

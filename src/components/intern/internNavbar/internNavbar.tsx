@@ -6,10 +6,11 @@ import { flex } from "~/styled-system/patterns";
 
 export default component$(() => {
   const nav = useNavigate();
-  const isMenuOpen = useSignal(false);
 
   const role = useContext(roleContext);
   const user = useContext(usernameContext);
+
+  const isMenuOpen = useSignal(false);
 
   const toggleMenu = $(() => {
     isMenuOpen.value = !isMenuOpen.value;
@@ -18,6 +19,17 @@ export default component$(() => {
   const handleNavigate = $((path: string) => {
     nav(path);
     isMenuOpen.value = false;
+  });
+
+  const handleSignOut = $(async () => {
+    await fetch("http://localhost:4000/sign-out", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    user.value = "";
+    role.value = "guest";
+    handleNavigate("/sign-in");
   });
 
   return (
@@ -44,20 +56,28 @@ export default component$(() => {
             h: "70px",
           })}
         >
-          <button
+          <div
             onClick$={() => handleNavigate("/")}
             class={css({
-              fontSize: "1.5rem",
-              fontWeight: "bold",
-              color: "amber.400",
-              p: "0.5rem",
               cursor: "pointer",
-              bg: "gray.800",
-              borderRadius: "lg",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "6px",
+
+              _hover: { opacity: 0.9 },
             })}
           >
-            PTI
-          </button>
+            <img
+              src="/pti.jpg"
+              alt="PTI Logo"
+              class={css({
+                height: "2.5rem",
+                width: "auto",
+                objectFit: "contain",
+              })}
+            />
+          </div>
 
           <div
             class={css({
@@ -75,7 +95,6 @@ export default component$(() => {
                 fontSize: "1rem",
                 color: "dark",
                 _hover: { color: "amber.400" },
-                transition: "color 0.2s",
               })}
             >
               Home
@@ -89,7 +108,6 @@ export default component$(() => {
                 fontSize: "1rem",
                 color: "dark",
                 _hover: { color: "amber.400" },
-                transition: "color 0.2s",
               })}
             >
               Products
@@ -103,7 +121,6 @@ export default component$(() => {
                 fontSize: "1rem",
                 color: "dark",
                 _hover: { color: "amber.400" },
-                transition: "color 0.2s",
               })}
             >
               Blog
@@ -117,38 +134,33 @@ export default component$(() => {
                 fontSize: "1rem",
                 color: "dark",
                 _hover: { color: "amber.400" },
-                transition: "color 0.2s",
               })}
             >
               Contact
             </button>
 
-            {role.value !== "guest" ? (
-              <button
-                onClick$={async () => {
-                  await fetch("http://localhost:4000/sign-out", {
-                    method: "POST",
-                    credentials: "include",
-                  });
-
-                  handleNavigate("/sign-in");
-                  role.value = "guest";
-                }}
-                class={css({
-                  cursor: "pointer",
-                  bg: "gray.800",
-                  color: "amber.400",
-                  border: "none",
-                  px: "1.5rem",
-                  py: "0.5rem",
-                  borderRadius: "6px",
-                  fontSize: "1rem",
-                  fontWeight: "semibold",
-                  transition: "background 0.2s",
-                })}
-              >
-                Sign Out
-              </button>
+            {role.value !== "guest" && user.value ? (
+              <div class={flex({ align: "center", gap: "1rem" })}>
+                <span class={css({ color: "gray.700", fontWeight: "medium" })}>
+                  Hi, {user.value}
+                </span>
+                <button
+                  onClick$={handleSignOut}
+                  class={css({
+                    cursor: "pointer",
+                    bg: "gray.800",
+                    color: "amber.400",
+                    border: "none",
+                    px: "1.5rem",
+                    py: "0.5rem",
+                    borderRadius: "6px",
+                    fontSize: "1rem",
+                    fontWeight: "semibold",
+                  })}
+                >
+                  Sign Out
+                </button>
+              </div>
             ) : (
               <button
                 onClick$={() => handleNavigate("/sign-in")}
@@ -162,7 +174,6 @@ export default component$(() => {
                   borderRadius: "6px",
                   fontSize: "1rem",
                   fontWeight: "semibold",
-                  transition: "background 0.2s",
                 })}
               >
                 Sign In
@@ -180,7 +191,6 @@ export default component$(() => {
               cursor: "pointer",
               color: "dark",
             })}
-            aria-label="Toggle menu"
           >
             ☰
           </button>
@@ -191,22 +201,20 @@ export default component$(() => {
             display: { base: "flex", md: "none" },
             flexDirection: "column",
             gap: "1rem",
-            pb: "1rem",
             maxHeight: isMenuOpen.value ? "500px" : "0",
             overflow: "hidden",
             transition: "max-height 0.3s ease",
+            pb: isMenuOpen.value ? "1rem" : "0",
           })}
         >
           <button
             onClick$={() => handleNavigate("/")}
             class={css({
-              cursor: "pointer",
-              bg: "transparent",
-              border: "none",
-              fontSize: "1rem",
-              color: "dark",
               textAlign: "left",
               py: "0.5rem",
+              color: "dark",
+              bg: "transparent",
+              border: "none",
               _hover: { color: "amber.400" },
             })}
           >
@@ -215,13 +223,11 @@ export default component$(() => {
           <button
             onClick$={() => handleNavigate("/products")}
             class={css({
-              cursor: "pointer",
-              bg: "transparent",
-              border: "none",
-              fontSize: "1rem",
-              color: "dark",
               textAlign: "left",
               py: "0.5rem",
+              color: "dark",
+              bg: "transparent",
+              border: "none",
               _hover: { color: "amber.400" },
             })}
           >
@@ -230,13 +236,11 @@ export default component$(() => {
           <button
             onClick$={() => handleNavigate("/blog")}
             class={css({
-              cursor: "pointer",
-              bg: "transparent",
-              border: "none",
-              fontSize: "1rem",
-              color: "dark",
               textAlign: "left",
               py: "0.5rem",
+              color: "dark",
+              bg: "transparent",
+              border: "none",
               _hover: { color: "amber.400" },
             })}
           >
@@ -245,62 +249,59 @@ export default component$(() => {
           <button
             onClick$={() => handleNavigate("/contact")}
             class={css({
-              cursor: "pointer",
-              bg: "transparent",
-              border: "none",
-              fontSize: "1rem",
-              color: "dark",
               textAlign: "left",
               py: "0.5rem",
+              color: "dark",
+              bg: "transparent",
+              border: "none",
               _hover: { color: "amber.400" },
             })}
           >
             Contact
           </button>
 
-          {role.value !== "guest" ? (
-            <button
-              onClick$={async () => {
-                await fetch("http://localhost:4000/sign-out", {
-                  method: "POST",
-                  credentials: "include",
-                });
-
-                handleNavigate("/sign-in");
-
-                user.value = "";
-                role.value = "guest";
-
-                console.log("out username:", user.value);
-                console.log("out role", role.value);
-              }}
-              class={css({
-                cursor: "pointer",
-                bg: "gray.800",
-                color: "amber.400",
-                border: "none",
-                px: "1.5rem",
-                py: "0.5rem",
-                borderRadius: "6px",
-                fontSize: "1rem",
-                fontWeight: "semibold",
-                transition: "background 0.2s",
-              })}
-            >
-              Sign Out
-            </button>
+          {role.value !== "guest" && user.value ? (
+            <>
+              <div
+                class={css({
+                  px: "0.5rem",
+                  py: "0.75rem",
+                  color: "gray.700",
+                  fontWeight: "medium",
+                  borderTop: "1px solid",
+                  borderColor: "gray.200",
+                })}
+              >
+                Hi, {user.value}
+              </div>
+              <button
+                onClick$={handleSignOut}
+                class={css({
+                  mx: "0.5rem",
+                  bg: "gray.800",
+                  color: "amber.400",
+                  border: "none",
+                  px: "1.5rem",
+                  py: "0.75rem",
+                  borderRadius: "6px",
+                  fontWeight: "semibold",
+                })}
+              >
+                Sign Out
+              </button>
+            </>
           ) : (
             <button
               onClick$={() => handleNavigate("/sign-in")}
               class={css({
-                cursor: "pointer",
+                mx: "0.5rem",
                 bg: "gray.800",
                 color: "amber.400",
                 border: "none",
                 px: "1.5rem",
-                py: "0.5rem",
+                py: "0.75rem",
                 borderRadius: "6px",
-                fontSize: "1rem",
+                fontWeight: "semibold",
               })}
             >
               Sign In

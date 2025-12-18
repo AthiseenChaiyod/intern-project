@@ -4,17 +4,26 @@ import type { DocumentHead } from "@builder.io/qwik-city";
 import { css } from "~/styled-system/css";
 import { flex } from "~/styled-system/patterns";
 import { roleContext, usernameContext } from "../layout";
+import { LuEye, LuEyeOff } from "@qwikest/icons/lucide";
 
 export default component$(() => {
   const nav = useNavigate();
+
+  const user = useContext(usernameContext);
+  const role = useContext(roleContext);
+
   const username = useSignal("");
   const password = useSignal("");
-
-  const role = useContext(roleContext);
-  const user = useContext(usernameContext);
+  const showPassword = useSignal(false);
+  const errorMessage = useSignal<string | null>(null);
+  const isLoading = useSignal(false);
 
   const handleNavigate = $((path: string) => {
     nav(path);
+  });
+
+  const togglePasswordVisibility = $(() => {
+    showPassword.value = !showPassword.value;
   });
 
   return (
@@ -59,12 +68,24 @@ export default component$(() => {
           Welcome back to PTI
         </p>
 
-        <div>
+        {errorMessage.value && (
           <div
             class={css({
+              bg: "red.100",
+              color: "red.700",
+              p: "0.75rem",
+              borderRadius: "6px",
               mb: "1.5rem",
+              textAlign: "center",
+              fontSize: "0.95rem",
             })}
           >
+            {errorMessage.value}
+          </div>
+        )}
+
+        <div>
+          <div class={css({ mb: "1.5rem" })}>
             <label
               class={css({
                 display: "block",
@@ -78,7 +99,7 @@ export default component$(() => {
               type="text"
               required
               bind:value={username}
-              placeholder="username"
+              placeholder="Your username"
               class={css({
                 w: "full",
                 p: "0.75rem",
@@ -86,6 +107,7 @@ export default component$(() => {
                 borderColor: "gray.300",
                 borderRadius: "6px",
                 fontSize: "1rem",
+
                 _focus: {
                   outline: "none",
                   borderColor: "gray.800",
@@ -95,11 +117,7 @@ export default component$(() => {
             />
           </div>
 
-          <div
-            class={css({
-              mb: "1rem",
-            })}
-          >
+          <div class={css({ mb: "1rem" })}>
             <label
               class={css({
                 display: "block",
@@ -109,33 +127,50 @@ export default component$(() => {
             >
               Password
             </label>
-            <input
-              type="password"
-              required
-              bind:value={password}
-              placeholder="••••••••"
-              class={css({
-                w: "full",
-                p: "0.75rem",
-                border: "1px solid",
-                borderColor: "gray.300",
-                borderRadius: "6px",
-                fontSize: "1rem",
-                _focus: {
-                  outline: "none",
-                  borderColor: "gray.800",
-                  boxShadow: "0 0 0 3px rgba(37, 99, 235, 0.1)",
-                },
-              })}
-            />
+            <div class={css({ position: "relative" })}>
+              <input
+                type={showPassword.value ? "text" : "password"}
+                required
+                bind:value={password}
+                placeholder="••••••••"
+                class={css({
+                  w: "full",
+                  p: "0.75rem",
+                  pr: "3rem",
+                  border: "1px solid",
+                  borderColor: "gray.300",
+                  borderRadius: "6px",
+                  fontSize: "1rem",
+
+                  _focus: {
+                    outline: "none",
+                    borderColor: "gray.800",
+                    boxShadow: "0 0 0 3px rgba(37, 99, 235, 0.1)",
+                  },
+                })}
+              />
+              <button
+                type="button"
+                onClick$={togglePasswordVisibility}
+                class={css({
+                  position: "absolute",
+                  right: "0.75rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  bg: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "gray.600",
+
+                  _hover: { color: "gray.800" },
+                })}
+              >
+                {showPassword.value ? <LuEyeOff /> : <LuEye />}
+              </button>
+            </div>
           </div>
 
-          <div
-            class={flex({
-              justify: "flex-end",
-              mb: "1.5rem",
-            })}
-          >
+          <div class={flex({ justify: "flex-end", mb: "1.5rem" })}>
             <button
               type="button"
               onClick$={() => handleNavigate("/forgot-password")}
@@ -145,6 +180,7 @@ export default component$(() => {
                 cursor: "pointer",
                 bg: "transparent",
                 border: "none",
+
                 _hover: { textDecoration: "underline" },
               })}
             >
@@ -164,38 +200,54 @@ export default component$(() => {
               cursor: "pointer",
               border: "none",
               mb: "1.5rem",
-              _hover: { bg: "primaryDark" },
               transition: "background 0.2s",
+
+              _hover: { bg: "primaryDark" },
+              _disabled: {
+                bg: "gray.200",
+                color: "gray.400",
+                cursor: "default",
+              },
             })}
+            disabled={!username.value || !password.value || isLoading.value}
             onClick$={async () => {
-              const response = await fetch("http://localhost:4000/sign-in", {
-                body: JSON.stringify({
-                  username: username.value,
-                  password: password.value,
-                }),
-                credentials: "include",
-                method: "POST",
-              });
-              const body = await response.json();
+              errorMessage.value = null;
+              isLoading.value = true;
 
-              nav("http://localhost:5173/");
+              try {
+                const response = await fetch("http://localhost:4000/sign-in", {
+                  method: "POST",
+                  credentials: "include",
+                  body: JSON.stringify({
+                    username: username.value,
+                    password: password.value,
+                  }),
+                });
 
-              user.value = body.userData.username;
-              role.value = body.userData.role;
+                const body = await response.json();
 
-              console.log("username:", user.value);
-              console.log("role:", role.value);
+                if (!response.ok) {
+                  throw new Error(
+                    body.message || "Invalid username or password"
+                  );
+                }
+
+                user.value = body.userData.username;
+                role.value = body.userData.role;
+
+                nav("http://localhost:5173/");
+              } catch (err: any) {
+                errorMessage.value =
+                  err.message || "Login failed. Please try again.";
+              } finally {
+                isLoading.value = false;
+              }
             }}
           >
-            Sign In
+            {isLoading.value ? "Signing In..." : "Sign In"}
           </button>
 
-          <p
-            class={css({
-              textAlign: "center",
-              color: "secondary",
-            })}
-          >
+          <p class={css({ textAlign: "center", color: "secondary" })}>
             Don't have an account?{" "}
             <button
               type="button"
@@ -220,10 +272,4 @@ export default component$(() => {
 
 export const head: DocumentHead = {
   title: "Sign In - PTI",
-  meta: [
-    {
-      name: "description",
-      content: "Sign in to your PTI account",
-    },
-  ],
 };

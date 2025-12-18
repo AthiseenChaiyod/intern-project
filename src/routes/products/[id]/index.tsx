@@ -9,7 +9,7 @@ export default component$(() => {
 
   const products = [
     {
-      id: "1",
+      id: "car-parking-system",
       name: "Car Parking System",
       icon: "/parking.webp",
       description:
@@ -30,10 +30,10 @@ export default component$(() => {
         warranty: "5 years",
         implementation: "2-4 weeks",
       },
-      pricing: "Custom quotes available",
+      pricing: "Contact us for more detail",
     },
     {
-      id: "2",
+      id: "turnstiles-gate",
       name: "Turnstiles Gate",
       icon: "/turnstiles2.webp",
       description:
@@ -57,7 +57,7 @@ export default component$(() => {
       pricing: "Contact for quote",
     },
     {
-      id: "3",
+      id: "software-and-application",
       name: "Software & Application",
       icon: "/software-n-app.jpg",
       description:
@@ -81,7 +81,7 @@ export default component$(() => {
       pricing: "Subscription-based",
     },
     {
-      id: "4",
+      id: "visitor-management-system",
       name: "Visitor Management System",
       icon: "/vms2.jpg",
       description:
@@ -105,7 +105,7 @@ export default component$(() => {
       pricing: "Volume-based licensing",
     },
     {
-      id: "5",
+      id: "parking-guidance",
       name: "Parking Guidance",
       icon: "/parking-guidance.jpg",
       description:
@@ -134,7 +134,7 @@ export default component$(() => {
 
   if (!product) {
     return (
-      <section
+      <div
         class={css({
           py: "4rem",
           px: { base: "1rem", md: "2rem" },
@@ -183,7 +183,7 @@ export default component$(() => {
             ← Back to Products
           </button>
         </div>
-      </section>
+      </div>
     );
   }
 
@@ -212,8 +212,9 @@ export default component$(() => {
             bg: "transparent",
             border: "none",
             mb: "2rem",
-            _hover: { textDecoration: "underline" },
             fontWeight: "semibold",
+
+            _hover: { textDecoration: "underline" },
           })}
         >
           ← Back to Products
@@ -318,6 +319,7 @@ export default component$(() => {
                       class={css({
                         color: "dark",
                         fontSize: "1.05rem",
+
                         _before: {
                           content: '"✓ "',
                           color: "amber.400",
@@ -427,32 +429,12 @@ export default component$(() => {
                 borderTop: "2px solid",
                 borderColor: "gray.200",
                 display: "flex",
-                justifyContent: "space-between",
+                justifyContent: "end",
                 alignItems: "center",
                 flexWrap: "wrap",
                 gap: "1rem",
               })}
             >
-              <div>
-                <p
-                  class={css({
-                    fontSize: "0.95rem",
-                    color: "secondary",
-                    mb: "0.5rem",
-                  })}
-                >
-                  Pricing
-                </p>
-                <p
-                  class={css({
-                    fontSize: "1.5rem",
-                    fontWeight: "bold",
-                    color: "gray.800",
-                  })}
-                >
-                  {product.pricing}
-                </p>
-              </div>
               <button
                 onClick$={() => nav("/contact")}
                 class={css({
@@ -465,11 +447,12 @@ export default component$(() => {
                   cursor: "pointer",
                   fontSize: "1.05rem",
                   fontWeight: "semibold",
-                  _hover: { transform: "translateY(-2px)" },
                   transition: "all 0.2s",
+
+                  _hover: { transform: "translateY(-2px)" },
                 })}
               >
-                Request a Demo
+                Contact Us
               </button>
             </div>
           </div>
@@ -482,11 +465,5 @@ export default component$(() => {
 export const head: DocumentHead = () => {
   return {
     title: "Product Details - PTI",
-    meta: [
-      {
-        name: "description",
-        content: "Explore detailed information about our parking solutions",
-      },
-    ],
   };
 };

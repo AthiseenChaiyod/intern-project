@@ -1,4 +1,4 @@
-import { component$, useSignal, $ } from "@builder.io/qwik";
+import { component$, useSignal } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 import { css } from "~/styled-system/css";
 import { grid } from "~/styled-system/patterns";
@@ -11,46 +11,9 @@ export default component$(() => {
   const company = useSignal("");
   const message = useSignal("");
 
-  const handleSubmit = $((e: Event) => {
-    e.preventDefault();
-
-    // ============================================
-    // TODO: BACKEND INTEGRATION REQUIRED
-    // ============================================
-    // Integrate with your backend API to submit contact form data
-    //
-    // const response = await fetch('/api/contact', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     name: name.value,
-    //     email: email.value,
-    //     phone: phone.value,
-    //     company: company.value,
-    //     message: message.value
-    //   })
-    // });
-    //
-    // if (response.ok) {
-    //   // Show success message to user
-    //   // Reset form fields
-    //   name.value = "";
-    //   email.value = "";
-    //   phone.value = "";
-    //   company.value = "";
-    //   message.value = "";
-    // } else {
-    //   // Handle error (show error message to user)
-    // }
-    // ============================================
-
-    // Temporary: Reset form (replace with actual API integration)
-    name.value = "";
-    email.value = "";
-    phone.value = "";
-    company.value = "";
-    message.value = "";
-  });
+  const isSubmitting = useSignal(false);
+  const successMessage = useSignal<string | null>(null);
+  const errorMessage = useSignal<string | null>(null);
 
   return (
     <>
@@ -102,6 +65,42 @@ export default component$(() => {
             px: { base: "1rem", md: "2rem" },
           })}
         >
+          {successMessage.value && (
+            <div
+              class={css({
+                bg: "green.100",
+                color: "green.800",
+                p: "1rem",
+                borderRadius: "8px",
+                mb: "1.5rem",
+                textAlign: "center",
+                fontWeight: "medium",
+                border: "1px solid",
+                borderColor: "green.300",
+              })}
+            >
+              {successMessage.value}
+            </div>
+          )}
+
+          {errorMessage.value && (
+            <div
+              class={css({
+                bg: "red.100",
+                color: "red.800",
+                p: "1rem",
+                borderRadius: "8px",
+                mb: "1.5rem",
+                textAlign: "center",
+                fontWeight: "medium",
+                border: "1px solid",
+                borderColor: "red.300",
+              })}
+            >
+              {errorMessage.value}
+            </div>
+          )}
+
           <div
             class={grid({
               columns: { base: 1, md: 2 },
@@ -118,12 +117,59 @@ export default component$(() => {
               >
                 Send Us a Message
               </h2>
-              <form onSubmit$={handleSubmit}>
-                <div
-                  class={css({
-                    mb: "1.5rem",
-                  })}
-                >
+
+              <form
+                action="https://api.web3forms.com/submit"
+                method="POST"
+                onSubmit$={(e) => {
+                  if (isSubmitting.value) {
+                    e.preventDefault();
+                    return;
+                  }
+
+                  if (
+                    !name.value.trim() ||
+                    !email.value.trim() ||
+                    !message.value.trim()
+                  ) {
+                    errorMessage.value =
+                      "Please fill in all required fields (Name, Email, Message)";
+                    successMessage.value = null;
+                    e.preventDefault();
+                    return;
+                  }
+
+                  isSubmitting.value = true;
+                  errorMessage.value = null;
+                  successMessage.value = "Sending your message...";
+
+                  name.value = "";
+                  email.value = "";
+                  phone.value = "";
+                  company.value = "";
+                  message.value = "";
+
+                  setTimeout(() => {
+                    successMessage.value =
+                      "Message sent successfully! Thank you for contacting us.";
+                    isSubmitting.value = false;
+                  }, 1500);
+                }}
+              >
+                <input
+                  type="hidden"
+                  name="access_key"
+                  value="a72f88de-dbe1-4c8f-8e50-1b7a87c3f4c9"
+                />
+
+                <input
+                  type="checkbox"
+                  name="botcheck"
+                  class={css({ display: "none" })}
+                  style="display: none;"
+                />
+
+                <div class={css({ mb: "1.5rem" })}>
                   <label
                     class={css({
                       display: "block",
@@ -135,8 +181,10 @@ export default component$(() => {
                   </label>
                   <input
                     type="text"
+                    name="name"
                     required
                     bind:value={name}
+                    disabled={isSubmitting.value}
                     class={css({
                       w: "full",
                       p: "0.75rem",
@@ -153,11 +201,7 @@ export default component$(() => {
                   />
                 </div>
 
-                <div
-                  class={css({
-                    mb: "1.5rem",
-                  })}
-                >
+                <div class={css({ mb: "1.5rem" })}>
                   <label
                     class={css({
                       display: "block",
@@ -169,8 +213,10 @@ export default component$(() => {
                   </label>
                   <input
                     type="email"
+                    name="email"
                     required
                     bind:value={email}
+                    disabled={isSubmitting.value}
                     class={css({
                       w: "full",
                       p: "0.75rem",
@@ -187,11 +233,7 @@ export default component$(() => {
                   />
                 </div>
 
-                <div
-                  class={css({
-                    mb: "1.5rem",
-                  })}
-                >
+                <div class={css({ mb: "1.5rem" })}>
                   <label
                     class={css({
                       display: "block",
@@ -203,7 +245,9 @@ export default component$(() => {
                   </label>
                   <input
                     type="tel"
+                    name="phone"
                     bind:value={phone}
+                    disabled={isSubmitting.value}
                     class={css({
                       w: "full",
                       p: "0.75rem",
@@ -220,11 +264,7 @@ export default component$(() => {
                   />
                 </div>
 
-                <div
-                  class={css({
-                    mb: "1.5rem",
-                  })}
-                >
+                <div class={css({ mb: "1.5rem" })}>
                   <label
                     class={css({
                       display: "block",
@@ -236,7 +276,9 @@ export default component$(() => {
                   </label>
                   <input
                     type="text"
+                    name="company"
                     bind:value={company}
+                    disabled={isSubmitting.value}
                     class={css({
                       w: "full",
                       p: "0.75rem",
@@ -253,11 +295,7 @@ export default component$(() => {
                   />
                 </div>
 
-                <div
-                  class={css({
-                    mb: "1.5rem",
-                  })}
-                >
+                <div class={css({ mb: "1.5rem" })}>
                   <label
                     class={css({
                       display: "block",
@@ -268,9 +306,11 @@ export default component$(() => {
                     Message *
                   </label>
                   <textarea
+                    name="message"
                     required
                     rows={5}
                     bind:value={message}
+                    disabled={isSubmitting.value}
                     class={css({
                       w: "full",
                       p: "0.75rem",
@@ -290,6 +330,7 @@ export default component$(() => {
 
                 <button
                   type="submit"
+                  disabled={isSubmitting.value}
                   class={css({
                     w: "full",
                     bg: "amber.400",
@@ -301,10 +342,15 @@ export default component$(() => {
                     cursor: "pointer",
                     border: "none",
                     transition: "background 0.2s",
-                    _hover: { bg: "amber.300" },
+                    _hover: { bg: "amber.500" },
+                    _disabled: {
+                      bg: "gray.300",
+                      color: "gray.500",
+                      cursor: "not-allowed",
+                    },
                   })}
                 >
-                  Send Message
+                  {isSubmitting.value ? "Sending Message..." : "Send Message"}
                 </button>
               </form>
             </div>
@@ -320,11 +366,7 @@ export default component$(() => {
                 Contact Information
               </h2>
 
-              <div
-                class={css({
-                  mb: "2rem",
-                })}
-              >
+              <div class={css({ mb: "2rem" })}>
                 <div
                   class={css({
                     bg: "light",
@@ -419,11 +461,7 @@ export default component$(() => {
                 </div>
 
                 <div
-                  class={css({
-                    bg: "light",
-                    p: "1.5rem",
-                    borderRadius: "8px",
-                  })}
+                  class={css({ bg: "light", p: "1.5rem", borderRadius: "8px" })}
                 >
                   <h3
                     class={css({
@@ -456,11 +494,4 @@ export default component$(() => {
 
 export const head: DocumentHead = {
   title: "Contact Us - PTI",
-  meta: [
-    {
-      name: "description",
-      content:
-        "Get in touch with PTI for inquiries about our parking solutions",
-    },
-  ],
 };

@@ -79,8 +79,9 @@ export default component$(() => {
                 fontWeight: "semibold",
                 cursor: "pointer",
                 border: "none",
-                _hover: { transform: "translateY(-2px)", boxShadow: "lg" },
                 transition: "all 0.2s",
+
+                _hover: { transform: "translateY(-2px)", boxShadow: "lg" },
               })}
             >
               View Products
@@ -97,8 +98,9 @@ export default component$(() => {
                 fontWeight: "semibold",
                 cursor: "pointer",
                 borderWidth: "2px",
-                _hover: { bg: "amber.400", color: "gray.800" },
                 transition: "all 0.2s",
+
+                _hover: { bg: "amber.400", color: "gray.800" },
               })}
             >
               Contact Us
@@ -142,8 +144,9 @@ export default component$(() => {
                 p: "2rem",
                 borderRadius: "12px",
                 boxShadow: "md",
-                _hover: { transform: "translateY(-4px)", boxShadow: "lg" },
                 transition: "all 0.3s",
+
+                _hover: { transform: "translateY(-4px)", boxShadow: "lg" },
               })}
             >
               <div
@@ -185,8 +188,9 @@ export default component$(() => {
                 p: "2rem",
                 borderRadius: "12px",
                 boxShadow: "md",
-                _hover: { transform: "translateY(-4px)", boxShadow: "lg" },
                 transition: "all 0.3s",
+
+                _hover: { transform: "translateY(-4px)", boxShadow: "lg" },
               })}
             >
               <div
@@ -228,8 +232,9 @@ export default component$(() => {
                 p: "2rem",
                 borderRadius: "12px",
                 boxShadow: "md",
-                _hover: { transform: "translateY(-4px)", boxShadow: "lg" },
                 transition: "all 0.3s",
+
+                _hover: { transform: "translateY(-4px)", boxShadow: "lg" },
               })}
             >
               <div
@@ -271,8 +276,9 @@ export default component$(() => {
                 p: "2rem",
                 borderRadius: "12px",
                 boxShadow: "md",
-                _hover: { transform: "translateY(-4px)", boxShadow: "lg" },
                 transition: "all 0.3s",
+
+                _hover: { transform: "translateY(-4px)", boxShadow: "lg" },
               })}
             >
               <div
@@ -314,8 +320,9 @@ export default component$(() => {
                 p: "2rem",
                 borderRadius: "12px",
                 boxShadow: "md",
-                _hover: { transform: "translateY(-4px)", boxShadow: "lg" },
                 transition: "all 0.3s",
+
+                _hover: { transform: "translateY(-4px)", boxShadow: "lg" },
               })}
             >
               <div
@@ -480,12 +487,5 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "Park Tech Innovations - Home",
-  meta: [
-    {
-      name: "description",
-      content:
-        "Leading provider of intelligent car parking solutions and access control systems",
-    },
-  ],
+  title: "Home - PTI",
 };

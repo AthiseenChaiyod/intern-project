@@ -16,22 +16,20 @@ export const usePost = routeLoader$(async () => {
 
 export default component$(() => {
   const nav = useNavigate();
-  const displayedPostsCount = useSignal(6);
 
   const posts = usePost().value;
-
   const role = useContext(roleContext);
+
+  const displayedPostsCount = useSignal(6);
+  const displayedPosts = posts.slice(0, displayedPostsCount.value);
+  const hasMorePosts = displayedPostsCount.value < posts.length;
 
   const handleNavigate = $((path: string) => {
     nav(path);
   });
-
   const handleSeeMore = $(() => {
     displayedPostsCount.value += 6;
   });
-
-  const displayedPosts = posts.slice(0, displayedPostsCount.value);
-  const hasMorePosts = displayedPostsCount.value < posts.length;
 
   return (
     <>
@@ -240,8 +238,9 @@ export default component$(() => {
                   fontWeight: "semibold",
                   cursor: "pointer",
                   border: "none",
-                  _hover: { transform: "translateY(-2px)" },
                   transition: "all 0.2s",
+
+                  _hover: { transform: "translateY(-2px)" },
                 })}
               >
                 See More Blog Posts
@@ -270,11 +269,4 @@ export default component$(() => {
 
 export const head: DocumentHead = {
   title: "Blog - PTI",
-  meta: [
-    {
-      name: "description",
-      content:
-        "Read the latest insights and updates about parking solutions and technology",
-    },
-  ],
 };

@@ -6,14 +6,72 @@ import { css } from "~/styled-system/css";
 
 export default component$(() => {
   const nav = useNavigate();
+
+  const user = useContext(usernameContext);
+
   const title = useSignal("");
   const category = useSignal("Technology");
   const excerpt = useSignal("");
   const content = useSignal("");
-  const user = useContext(usernameContext);
+
+  const successMessage = useSignal<string | null>(null);
+  const errorMessage = useSignal<string | null>(null);
+  const isLoading = useSignal(false);
 
   const handleNavigate = $((path: string) => {
     nav(path);
+  });
+
+  // แทนที่ส่วน handlePublish เดิมด้วยอันนี้
+
+  const handlePublish = $(async () => {
+    successMessage.value = null;
+    errorMessage.value = null;
+    isLoading.value = true;
+
+    try {
+      const response = await fetch("http://localhost:4000/post", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: title.value.trim(),
+          category: category.value.toLowerCase(),
+          excerpt: excerpt.value.trim(),
+          content: content.value.trim(),
+          author: user.value,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to publish post");
+      }
+
+      // สำเร็จ!
+      successMessage.value = "Blog post published successfully!";
+
+      // เคลียร์ฟอร์ม
+      title.value = "";
+      excerpt.value = "";
+      content.value = "";
+      category.value = "Technology";
+
+      // เลื่อนหน้าไปด้านบนสุดทันที
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      // ข้อความหายเองหลัง 5 วินาที
+      setTimeout(() => {
+        successMessage.value = null;
+      }, 5000);
+    } catch (err: any) {
+      errorMessage.value =
+        err.message || "Something went wrong. Please try again.";
+    } finally {
+      isLoading.value = false;
+    }
   });
 
   return (
@@ -47,6 +105,7 @@ export default component$(() => {
           >
             Create Blog Post
           </h1>
+
           <button
             onClick$={() => handleNavigate("/blog")}
             class={css({
@@ -62,6 +121,42 @@ export default component$(() => {
           </button>
         </div>
 
+        {successMessage.value && (
+          <div
+            class={css({
+              bg: "green.100",
+              color: "green.800",
+              p: "1rem",
+              borderRadius: "8px",
+              mb: "1.5rem",
+              textAlign: "center",
+              fontWeight: "medium",
+              border: "1px solid",
+              borderColor: "green.300",
+            })}
+          >
+            {successMessage.value}
+          </div>
+        )}
+
+        {errorMessage.value && (
+          <div
+            class={css({
+              bg: "red.100",
+              color: "red.800",
+              p: "1rem",
+              borderRadius: "8px",
+              mb: "1.5rem",
+              textAlign: "center",
+              fontWeight: "medium",
+              border: "1px solid",
+              borderColor: "red.300",
+            })}
+          >
+            {errorMessage.value}
+          </div>
+        )}
+
         <div
           class={css({
             bg: "white",
@@ -71,11 +166,7 @@ export default component$(() => {
           })}
         >
           <div>
-            <div
-              class={css({
-                mb: "1.5rem",
-              })}
-            >
+            <div class={css({ mb: "1.5rem" })}>
               <label
                 class={css({
                   display: "block",
@@ -161,8 +252,7 @@ export default component$(() => {
                 </label>
                 <input
                   type="text"
-                  required
-                  placeholder={user.value}
+                  value={user.value || "Guest"}
                   disabled
                   class={css({
                     w: "full",
@@ -172,21 +262,13 @@ export default component$(() => {
                     borderColor: "gray.300",
                     borderRadius: "6px",
                     fontSize: "1rem",
-                    _focus: {
-                      outline: "none",
-                      borderColor: "gray.800",
-                      boxShadow: "0 0 0 3px rgba(37, 99, 235, 0.1)",
-                    },
+                    bg: "gray.50",
                   })}
                 />
               </div>
             </div>
 
-            <div
-              class={css({
-                mb: "1.5rem",
-              })}
-            >
+            <div class={css({ mb: "1.5rem" })}>
               <label
                 class={css({
                   display: "block",
@@ -218,11 +300,7 @@ export default component$(() => {
               />
             </div>
 
-            <div
-              class={css({
-                mb: "2rem",
-              })}
-            >
+            <div class={css({ mb: "2rem" })}>
               <label
                 class={css({
                   display: "block",
@@ -261,8 +339,9 @@ export default component$(() => {
                 justifyContent: "flex-end",
               })}
             >
-              <div
+              <button
                 onClick$={() => handleNavigate("/blog")}
+                disabled={isLoading.value}
                 class={css({
                   px: "2rem",
                   py: "0.75rem",
@@ -274,24 +353,20 @@ export default component$(() => {
                   color: "gray.700",
                   border: "none",
                   _hover: { bg: "gray.300" },
-                  transition: "background 0.2s",
+                  _disabled: { opacity: 0.6, cursor: "not-allowed" },
                 })}
               >
                 Cancel
-              </div>
-              <div
-                onClick$={async () => {
-                  await fetch("http://localhost:4000/post", {
-                    method: "POST",
-                    credentials: "include",
-                    body: JSON.stringify({
-                      title: title.value,
-                      category: category.value.toLowerCase(),
-                      excerpt: excerpt.value,
-                      content: content.value,
-                    }),
-                  });
-                }}
+              </button>
+
+              <button
+                onClick$={handlePublish}
+                disabled={
+                  isLoading.value ||
+                  !title.value.trim() ||
+                  !excerpt.value.trim() ||
+                  !content.value.trim()
+                }
                 class={css({
                   px: "2rem",
                   py: "0.75rem",
@@ -303,11 +378,15 @@ export default component$(() => {
                   color: "gray.800",
                   border: "none",
                   _hover: { bg: "amber.500" },
-                  transition: "background 0.2s",
+                  _disabled: {
+                    bg: "gray.300",
+                    color: "gray.500",
+                    cursor: "not-allowed",
+                  },
                 })}
               >
-                Publish Post
-              </div>
+                {isLoading.value ? "Publishing..." : "Publish Post"}
+              </button>
             </div>
           </div>
         </div>
@@ -317,11 +396,5 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "Park Tech Innovations - Create Blog",
-  meta: [
-    {
-      name: "description",
-      content: "Create a new blog post",
-    },
-  ],
+  title: "Create Blog - PTI",
 };

@@ -79,6 +79,7 @@ const ProductSection = component$(
                   height: "100%",
                   objectFit: "cover",
                   transition: "transform 0.6s ease",
+
                   _hover: { transform: "scale(1.08)" },
                 })}
               />
@@ -144,6 +145,7 @@ const ProductSection = component$(
                       class={css({
                         color: "secondary",
                         fontSize: "0.95rem",
+
                         _before: {
                           content: '"✓ "',
                           color: "amber.400",
@@ -170,8 +172,9 @@ const ProductSection = component$(
                   cursor: "pointer",
                   fontSize: "1rem",
                   fontWeight: "semibold",
-                  _hover: { bg: "primaryDark", transform: "translateY(-2px)" },
                   transition: "all 0.3s ease",
+
+                  _hover: { bg: "primaryDark", transform: "translateY(-2px)" },
                 })}
               >
                 View Full Details →
@@ -192,7 +195,7 @@ export default component$(() => {
 
   const products = [
     {
-      id: 1,
+      id: "car-parking-system",
       name: "Car Parking System",
       icon: "/parking.webp",
       shortDesc: "Automated parking with LPR and real-time access control",
@@ -209,7 +212,7 @@ export default component$(() => {
       ],
     },
     {
-      id: 2,
+      id: "turnstiles-gate",
       name: "Turnstiles Gate",
       icon: "/turnstiles2.webp",
       shortDesc: "High-security pedestrian access control system",
@@ -226,7 +229,7 @@ export default component$(() => {
       ],
     },
     {
-      id: 3,
+      id: "software-and-application",
       name: "Software & Application",
       icon: "/software-n-app.jpg",
       shortDesc: "Complete parking management platform with analytics",
@@ -243,7 +246,7 @@ export default component$(() => {
       ],
     },
     {
-      id: 4,
+      id: "visitor-management-system",
       name: "Visitor Management System",
       icon: "/vms2.jpg",
       shortDesc: "Digital registration and security tracking for guests",
@@ -260,7 +263,7 @@ export default component$(() => {
       ],
     },
     {
-      id: 5,
+      id: "parking-guidance",
       name: "Parking Guidance",
       icon: "/parking-guidance.jpg",
       shortDesc: "Smart sensors guide drivers to available spaces",
@@ -329,12 +332,5 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "Products - ParkSmart",
-  meta: [
-    {
-      name: "description",
-      content:
-        "Explore our range of parking solutions including car parking systems, turnstiles, and management software",
-    },
-  ],
+  title: "Products - PTI",
 };

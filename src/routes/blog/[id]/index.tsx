@@ -24,14 +24,15 @@ export default component$(() => {
   const nav = useNavigate();
   const loc = useLocation();
 
-  const commentText = useSignal("");
-
-  const role = useContext(roleContext);
-  const user = useContext(usernameContext);
-
   const post = usePost().value;
 
+  const user = useContext(usernameContext);
+  const role = useContext(roleContext);
+
+  const commentContent = useSignal("");
+
   const commentTrigger = useSignal(0);
+  const isCommentLoading = useSignal(false);
   const commentSection = useResource$(async ({ track }) => {
     track(() => commentTrigger.value);
 
@@ -114,7 +115,6 @@ export default component$(() => {
           px: { base: "1rem", md: "2rem" },
         })}
       >
-        {/* Back Button */}
         <button
           onClick$={() => nav("/blog")}
           class={css({
@@ -131,7 +131,6 @@ export default component$(() => {
           ← Back to Blog
         </button>
 
-        {/* Post Header */}
         <article
           class={css({
             bg: "white",
@@ -141,7 +140,6 @@ export default component$(() => {
             mb: "3rem",
           })}
         >
-          {/* Header Section */}
           <div
             class={css({
               bg: "linear-gradient(135deg, #1f2937 0%, #111827 100%)",
@@ -199,7 +197,6 @@ export default component$(() => {
             </div>
           </div>
 
-          {/* Content Section */}
           <div
             class={css({
               p: { base: "2rem", md: "3rem" },
@@ -219,7 +216,6 @@ export default component$(() => {
           </div>
         </article>
 
-        {/* Comments Section */}
         <div
           class={css({
             bg: "white",
@@ -254,9 +250,30 @@ export default component$(() => {
             </p>
           </div>
 
-          {/* Comments List */}
           <Resource
             value={commentSection}
+            onPending={() => (
+              <div
+                class={css({
+                  p: { base: "2rem", md: "3rem" },
+                  textAlign: "center",
+                  color: "secondary",
+                })}
+              >
+                Loading comments...
+              </div>
+            )}
+            onRejected={() => (
+              <div
+                class={css({
+                  p: { base: "2rem", md: "3rem" },
+                  textAlign: "center",
+                  color: "red.600",
+                })}
+              >
+                Error loading comments
+              </div>
+            )}
             onResolved={(comments) => {
               return (
                 <div
@@ -331,11 +348,46 @@ export default component$(() => {
                                 }).format(new Date(comment.date))}
                               </p>
                             </div>
+
+                            {user.value && comment.user === user.value && (
+                              <button
+                                onClick$={async () => {
+                                  if (
+                                    confirm(
+                                      "Are you sure you want to delete this comment?"
+                                    )
+                                  ) {
+                                    await fetch(
+                                      `http://localhost:4000/comment/${comment.id}`,
+                                      {
+                                        method: "DELETE",
+                                        credentials: "include",
+                                      }
+                                    );
+                                    commentTrigger.value++;
+                                  }
+                                }}
+                                class={css({
+                                  color: "red.600",
+                                  fontSize: "0.875rem",
+                                  bg: "transparent",
+                                  border: "none",
+                                  cursor: "pointer",
+                                  px: "0.75rem",
+                                  py: "0.25rem",
+                                  borderRadius: "4px",
+                                  _hover: { bg: "red.100" },
+                                })}
+                              >
+                                Delete
+                              </button>
+                            )}
                           </div>
                           <p
                             class={css({
                               color: "dark",
                               lineHeight: 1.6,
+                              whiteSpace: "pre-wrap",
                             })}
                           >
                             {comment.content}
@@ -347,10 +399,7 @@ export default component$(() => {
                 </div>
               );
             }}
-            onRejected={() => <>Error!</>}
           />
-
-          {/* Comment Form */}
           {role.value !== "guest" && (
             <div
               class={css({
@@ -370,11 +419,7 @@ export default component$(() => {
               </h3>
 
               <div>
-                <div
-                  class={css({
-                    mb: "1.5rem",
-                  })}
-                >
+                <div class={css({ mb: "1.5rem" })}>
                   <label
                     class={css({
                       display: "block",
@@ -388,11 +433,9 @@ export default component$(() => {
                   <textarea
                     required
                     rows={5}
-                    value={commentText.value}
-                    onInput$={(e: any) => {
-                      commentText.value = e.target.value;
-                    }}
+                    bind:value={commentContent}
                     placeholder="Share your thoughts..."
+                    disabled={isCommentLoading.value}
                     class={css({
                       w: "full",
                       p: "0.75rem",
@@ -407,24 +450,39 @@ export default component$(() => {
                         borderColor: "gray.800",
                         boxShadow: "0 0 0 3px rgba(37, 99, 235, 0.1)",
                       },
+                      _disabled: { opacity: 0.7, cursor: "not-allowed" },
                     })}
                   />
                 </div>
 
-                <div
+                <button
                   onClick$={async () => {
-                    await fetch("http://localhost:4000/comment", {
-                      method: "POST",
-                      body: JSON.stringify({
-                        postId: loc.params["id"],
-                        content: commentText.value,
-                        username: user.value,
-                      }),
-                    });
+                    if (!commentContent.value.trim()) return;
 
-                    commentTrigger.value++;
-                    commentText.value = "";
+                    isCommentLoading.value = true;
+                    try {
+                      await fetch("http://localhost:4000/comment", {
+                        method: "POST",
+                        credentials: "include",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          postId: loc.params["id"],
+                          content: commentContent.value.trim(),
+                          username: user.value,
+                        }),
+                      });
+
+                      commentContent.value = "";
+                      commentTrigger.value++;
+                    } catch (err) {
+                      alert("Failed to post comment. Please try again.");
+                    } finally {
+                      isCommentLoading.value = false;
+                    }
                   }}
+                  disabled={
+                    isCommentLoading.value || !commentContent.value.trim()
+                  }
                   class={css({
                     bg: "amber.400",
                     color: "gray.800",
@@ -436,10 +494,16 @@ export default component$(() => {
                     fontSize: "1rem",
                     fontWeight: "semibold",
                     transition: "background 0.2s",
+                    _hover: { bg: "amber.500" },
+                    _disabled: {
+                      bg: "gray.300",
+                      color: "gray.500",
+                      cursor: "not-allowed",
+                    },
                   })}
                 >
-                  Post Comment
-                </div>
+                  {isCommentLoading.value ? "Posting..." : "Post Comment"}
+                </button>
               </div>
             </div>
           )}
@@ -452,11 +516,5 @@ export default component$(() => {
 export const head: DocumentHead = () => {
   return {
     title: "Blog Post - PTI",
-    meta: [
-      {
-        name: "description",
-        content: "Read this article and share your thoughts in the comments",
-      },
-    ],
   };
 };
